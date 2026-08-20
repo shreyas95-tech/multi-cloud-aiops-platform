@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 import aiosqlite
 
 # Database file path - stored alongside the existing email_reports.db
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "aiops.db")
+DATABASE_PATH = os.environ.get("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "aiops.db"))
 
 
 @asynccontextmanager
