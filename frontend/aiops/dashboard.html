@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Multi-Cloud AIOps Platform</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+</head>
+<body>
+  <!-- Hamburger Menu Button (mobile only) -->
+  <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+    <span class="hamburger-icon"></span>
+    <span class="hamburger-icon"></span>
+    <span class="hamburger-icon"></span>
+  </button>
+
+  <!-- Sidebar Overlay (mobile only) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="sidebar-title">AIOps Platform</h1>
+      <div class="user-info">
+        <span class="user-name" id="sidebar-username">—</span>
+        <span class="role-badge" id="sidebar-role">—</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <a href="#" class="nav-item" data-section="monitors" data-role="Admin">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        Monitors
+      </a>
+      <a href="#" class="nav-item active" data-section="kb-upload" data-role="Admin">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        KB Upload
+      </a>
+      <a href="#" class="nav-item" data-section="kb-articles" data-role="all">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        KB Articles
+      </a>
+      <a href="#" class="nav-item" data-section="users" data-role="Admin">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        User Management
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+
+    <!-- Monitors Section (Admin) -->
+    <section class="content-section hidden" id="section-monitors">
+      <div class="content-card">
+        <h2 class="section-heading">Cloud Monitors</h2>
+        <p class="section-description">Resource status and cost overview across AWS, Azure, and GCP.</p>
+        
+        <h3 class="subsection-heading">Resource Status (CPU Utilization)</h3>
+        <div id="monitors-status-list">
+          <p class="empty-state">Loading resource statuses...</p>
+        </div>
+
+        <h3 class="subsection-heading" style="margin-top: 2rem;">Cost Overview</h3>
+        <div id="monitors-cost-list">
+          <p class="empty-state">Loading cost data...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KB Upload Section (Admin) -->
+    <section class="content-section hidden" id="section-kb-upload">
+      <div class="content-card">
+        <h2 class="section-heading">Upload Knowledge Base Document</h2>
+        <p class="section-description">Upload PDF, DOCX, or plain text files (max 10 MB).</p>
+        <form id="kb-upload-form" class="dashboard-form">
+          <div class="form-group">
+            <label for="kb-title">Document Title</label>
+            <input type="text" id="kb-title" placeholder="Enter document title" required>
+          </div>
+          <div class="form-group">
+            <label for="kb-file">Select File</label>
+            <input type="file" id="kb-file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" required>
+          </div>
+          <button type="submit" class="btn-primary" id="kb-upload-btn">Upload Document</button>
+        </form>
+        <div class="upload-status hidden" id="upload-status" role="alert" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- KB Articles Section (all roles) -->
+    <section class="content-section hidden" id="section-kb-articles">
+      <div class="content-card">
+        <h2 class="section-heading">Knowledge Base Articles</h2>
+        <p class="section-description">Browse and download available documents.</p>
+        <div class="kb-list" id="kb-articles-list">
+          <p class="empty-state">Loading documents...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Management Section (Admin) -->
+    <section class="content-section hidden" id="section-users">
+      <div class="content-card">
+        <h2 class="section-heading">User Management</h2>
+        <p class="section-description">Create new users and manage existing accounts.</p>
+
+        <form id="create-user-form" class="dashboard-form">
+          <h3 class="subsection-heading">Create User</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="new-user-username">Username</label>
+              <input type="text" id="new-user-username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+              <label for="new-user-password">Temporary Password</label>
+              <input type="password" id="new-user-password" placeholder="Temp password" required>
+            </div>
+            <div class="form-group">
+              <label for="new-user-role">Role</label>
+              <select id="new-user-role" required>
+                <option value="Admin">Admin</option>
+                <option value="L1_User">L1_User</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="create-user-btn">Create User</button>
+        </form>
+
+        <div class="create-user-status hidden" id="create-user-status" role="alert" aria-live="polite"></div>
+
+        <h3 class="subsection-heading" style="margin-top: 2rem;">All Users</h3>
+        <div class="users-table-wrapper" id="users-table-wrapper">
+          <table class="data-table" id="users-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr><td colspan="3" class="empty-state">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Query Bot Widget -->
+  <div id="query-bot-widget" class="bot-widget">
+    <button id="bot-toggle-btn" class="bot-toggle-btn" aria-label="Open query assistant" title="Query Assistant">
+      <svg class="bot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+        <circle cx="9" cy="16" r="1.5" fill="currentColor"></circle>
+        <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+        <line x1="12" y1="2" x2="12" y2="4"></line>
+      </svg>
+    </button>
+    <div id="bot-panel" class="bot-panel bot-panel--closed">
+      <div class="bot-panel-header">
+        <h3>Query Assistant</h3>
+        <button id="bot-close-btn" class="bot-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="bot-panel-body" id="bot-messages">
+        <div class="bot-message bot-message--system">
+          Hi! I can help you manage your cloud resources. Try something like "start my AWS instance i-abc123".
+        </div>
+      </div>
+      <form id="bot-query-form" class="bot-panel-footer">
+        <input type="text" id="bot-query-input" placeholder="Type your query..." autocomplete="off" maxlength="500">
+        <button type="submit" class="bot-send-btn" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

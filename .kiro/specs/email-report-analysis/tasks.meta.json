@@ -1,0 +1,282 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create project directory structure and configuration files": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346552003
+      },
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346566110
+      },
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346693810
+      }
+    ],
+    "1.2 Define SQLAlchemy data models and TimescaleDB schema": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346552865
+      },
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346699364
+      }
+    ],
+    "1.3 Define core data classes, enums, and interfaces": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346553564
+      },
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346700149
+      }
+    ],
+    "1.4 Set up Celery worker configuration and Redis connection": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346553656
+      },
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346700974
+      }
+    ],
+    "2.1 Implement password hashing, validation, and user registration": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346553748
+      }
+    ],
+    "2.3 Implement login, JWT session creation, and rate limiting": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346553880
+      }
+    ],
+    "2.5 Implement session validation and inactivity expiry": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346553994
+      }
+    ],
+    "3. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554112
+      }
+    ],
+    "4.1 Implement IMAP polling and email processing": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554195
+      }
+    ],
+    "4.4 Create Celery task for periodic email polling": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554279
+      }
+    ],
+    "5.1 Implement PDF parser using pdfplumber": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554364
+      }
+    ],
+    "5.2 Implement Excel parser using openpyxl": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554452
+      }
+    ],
+    "5.3 Implement CSV parser with auto-delimiter detection": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554571
+      }
+    ],
+    "5.6 Create Celery task for report parsing pipeline": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554717
+      }
+    ],
+    "6. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554798
+      }
+    ],
+    "7.1 Implement trend analysis algorithms": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554879
+      }
+    ],
+    "7.3 Implement trend computation orchestration": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346554959
+      }
+    ],
+    "7.5 Create Celery task for trend analysis": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555036
+      }
+    ],
+    "8.1 Implement z-score and IQR deviation detection": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555125
+      }
+    ],
+    "8.4 Implement multi-metric deviation detection and recording": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555206
+      }
+    ],
+    "8.7 Create Celery task for deviation detection": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555341
+      }
+    ],
+    "9. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555424
+      }
+    ],
+    "10.1 Implement WhatsApp message formatting and sending": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555506
+      }
+    ],
+    "10.4 Implement E.164 phone number validation": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555592
+      }
+    ],
+    "10.6 Create Celery task for WhatsApp notifications": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555667
+      }
+    ],
+    "11.1 Implement phone number CRUD and verification flow": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555760
+      }
+    ],
+    "12.1 Implement report listing and trend data endpoints": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555848
+      }
+    ],
+    "12.3 Implement WebSocket server for real-time updates": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346555933
+      }
+    ],
+    "13. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556021
+      }
+    ],
+    "14.1 Set up React app with routing and authentication": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556110
+      }
+    ],
+    "14.2 Implement report list and trend visualization page": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556196
+      }
+    ],
+    "14.3 Implement real-time WebSocket updates": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556336
+      }
+    ],
+    "14.4 Implement phone number management UI": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556428
+      }
+    ],
+    "15.1 Wire the full Celery pipeline end-to-end": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556501
+      }
+    ],
+    "15.2 Wire frontend to backend API with error handling": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556586
+      }
+    ],
+    "16. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "84ddd5c9-ec8c-4a6c-b73f-e3f0b3c6dbcd",
+        "chatSessionId": "sess_44de039b-d486-47d8-9e90-b5b7c351de07",
+        "timestamp": 1785346556669
+      }
+    ]
+  }
+}

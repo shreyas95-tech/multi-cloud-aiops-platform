@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Multi-Cloud AIOps Platform</title>
+  <link rel="stylesheet" href="login-styles.css">
+</head>
+<body>
+  <div class="login-wrapper">
+    <h1 class="platform-title">Multi-Cloud AIOps Platform</h1>
+
+    <!-- Login Form Card -->
+    <div class="login-card" id="login-card">
+      <h2 class="card-heading">Sign In</h2>
+      <p class="card-subtext">Enter your credentials to access the platform</p>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input
+            type="text"
+            id="login-username"
+            name="username"
+            placeholder="Enter your username"
+            autocomplete="username"
+            required
+          >
+          <span class="field-error" id="username-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input
+            type="password"
+            id="login-password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+          <span class="field-error" id="password-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
+
+        <div class="form-error hidden" id="login-error" role="alert" aria-live="polite"></div>
+
+        <a href="#" class="forgot-link" id="forgot-password-link">Forgot Password?</a>
+      </form>
+    </div>
+
+    <!-- First-Time Password Change Card -->
+    <div class="login-card hidden" id="password-change-card">
+      <h2 class="card-heading">Change Your Password</h2>
+      <p class="card-subtext">You must set a new password before continuing</p>
+
+      <form id="password-change-form" novalidate>
+        <div class="form-group">
+          <label for="current-password">Current Password</label>
+          <input
+            type="password"
+            id="current-password"
+            name="current-password"
+            placeholder="Enter current password"
+            autocomplete="current-password"
+            required
+          >
+          <span class="field-error" id="current-password-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="new-password">New Password</label>
+          <input
+            type="password"
+            id="new-password"
+            name="new-password"
+            placeholder="Min 8 chars, uppercase, lowercase, digit, special"
+            autocomplete="new-password"
+            required
+          >
+          <span class="field-error" id="new-password-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-password">Confirm New Password</label>
+          <input
+            type="password"
+            id="confirm-password"
+            name="confirm-password"
+            placeholder="Re-enter new password"
+            autocomplete="new-password"
+            required
+          >
+          <span class="field-error" id="confirm-password-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <button type="submit" class="btn-primary" id="change-btn">Update Password</button>
+
+        <div class="form-error hidden" id="change-error" role="alert" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <!-- Password Reset Card -->
+    <div class="login-card hidden" id="reset-card">
+      <h2 class="card-heading">Reset Password</h2>
+      <p class="card-subtext">Enter your username to receive a reset token</p>
+
+      <form id="reset-form" novalidate>
+        <div class="form-group">
+          <label for="reset-username">Username</label>
+          <input
+            type="text"
+            id="reset-username"
+            name="reset-username"
+            placeholder="Enter your username"
+            required
+          >
+          <span class="field-error" id="reset-username-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <button type="submit" class="btn-primary" id="reset-btn">Request Reset</button>
+
+        <div class="form-error" id="reset-form-error" role="alert" aria-live="polite"></div>
+
+        <a href="#" class="forgot-link" id="back-to-login-link">Back to Sign In</a>
+      </form>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

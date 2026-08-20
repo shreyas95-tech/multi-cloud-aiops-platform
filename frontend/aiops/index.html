@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Cloud AIOps Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Multi-Cloud AIOps Platform</h1>
+      <p class="subtitle">Manage cloud resources across AWS, Azure, and GCP using natural language.</p>
+
+      <form id="query-form" role="search" aria-label="Cloud operations query">
+        <div class="input-group">
+          <label for="query-input">Enter your query</label>
+          <input
+            type="text"
+            id="query-input"
+            name="query"
+            maxlength="500"
+            placeholder="e.g., Start my EC2 instance i-0abc123def in AWS"
+            autocomplete="off"
+            aria-describedby="validation-message"
+          />
+          <span id="validation-message" class="validation-message" role="alert" aria-live="polite"></span>
+        </div>
+        <button type="submit" id="submit-btn">Submit Query</button>
+      </form>
+
+      <div id="loading-indicator" class="loading loading--hidden" aria-live="polite" aria-label="Loading">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Processing your query...</span>
+      </div>
+
+      <section id="result-display" class="result-card result-card--hidden" aria-live="polite" aria-label="Query result">
+        <h2>Result</h2>
+        <dl class="result-details">
+          <dt>Parsed Intent</dt>
+          <dd id="result-intent"></dd>
+
+          <dt>Cloud Provider</dt>
+          <dd id="result-provider"></dd>
+
+          <dt>Action</dt>
+          <dd id="result-action"></dd>
+
+          <dt>Status</dt>
+          <dd id="result-state"></dd>
+        </dl>
+      </section>
+
+      <div id="error-display" class="error-message error-message--hidden" role="alert" aria-live="assertive">
+        <p id="error-text"></p>
+      </div>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

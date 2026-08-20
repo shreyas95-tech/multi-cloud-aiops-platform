@@ -1,0 +1,229 @@
+/* ==========================================================================
+   Multi-Cloud AIOps Platform — Login Page Styles
+   Color palette:
+     - Background: #1e293b (dark navy)
+     - Card: #ffffff (white)
+     - Accent: #0ea5e9 (teal-blue)
+     - Accent hover: #0284c7
+     - Error: #ef4444
+     - Text primary: #1e293b
+     - Text secondary: #64748b
+   ========================================================================== */
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body — full-page dark background */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  line-height: 1.6;
+  background-color: #1e293b;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Wrapper centers content vertically and horizontally */
+.login-wrapper {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Platform title above card */
+.platform-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+/* Login card */
+.login-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Card heading */
+.card-heading {
+  color: #1e293b;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+/* Card subtext */
+.card-subtext {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Form group */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.375rem;
+}
+
+/* Inputs */
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #94a3b8;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  background-color: #ffffff;
+}
+
+.form-group input.input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Inline field error messages */
+.field-error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.375rem;
+  min-height: 1.1em;
+}
+
+/* Form-level error message */
+.form-error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+/* Primary button */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #0ea5e9;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: #0284c7;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  background-color: #7dd3fc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Forgot password / back link */
+.forgot-link {
+  display: block;
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: #0ea5e9;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+/* Utility: hidden */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Responsive: viewports < 480px
+   ========================================================================== */
+@media (max-width: 480px) {
+  body {
+    padding: 0.75rem;
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+
+  .platform-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: 10px;
+  }
+
+  .card-heading {
+    font-size: 1.2rem;
+  }
+}
+
+/* ==========================================================================
+   Responsive: viewports < 360px (very small mobile)
+   ========================================================================== */
+@media (max-width: 360px) {
+  .login-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-group input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-primary {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+  }
+}

@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  aiops-platform:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - JWT_SECRET_KEY=change-this-in-production
+      - PYTHONPATH=/app
+    volumes:
+      - ./uploads/kb:/app/uploads/kb
+    restart: unless-stopped

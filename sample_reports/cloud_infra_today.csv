@@ -1,0 +1,2 @@
+Date,CPU Utilization (%),Memory Usage (%),Disk I/O (MB/s),Network Latency (ms),Error Rate (%),Active Instances,Failed Deployments,API Response Time (ms),Uptime (%)
+2026-08-02,92,94,385,180,8.5,42,12,1850,95.20
