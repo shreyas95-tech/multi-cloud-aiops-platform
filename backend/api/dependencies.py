@@ -10,6 +10,8 @@ Registers all (provider, action) pairs in the Orchestrator's provider registry.
 Exports configured instances for use by route handlers.
 """
 
+import os
+
 from backend.ai_layer.parser import AILayer
 from backend.execution.aws_provider import AWSProvider
 from backend.execution.azure_provider import AzureProvider
@@ -17,11 +19,28 @@ from backend.execution.gcp_provider import GCPProvider
 from backend.monitoring.monitoring import MonitoringLayer
 from backend.orchestrator.orchestrator import Orchestrator
 
+# --- AWS live client configuration ---
+# Uses env vars (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY) or instance profile for credentials.
+_aws_region = os.environ.get("AWS_DEFAULT_REGION", "ap-south-1")
+
+try:
+    from backend.monitoring.aws_live_client import AWSLiveMonitoringClient
+    from backend.monitoring.aws_live_cost_client import AWSLiveCostClient
+
+    _aws_ec2_client = AWSLiveMonitoringClient(region_name=_aws_region)
+    _aws_cost_client = AWSLiveCostClient(region_name=_aws_region)
+except Exception:
+    _aws_ec2_client = None
+    _aws_cost_client = None
+
 # --- Instantiate services ---
 
 ai_layer = AILayer()
 orchestrator = Orchestrator()
-monitoring_layer = MonitoringLayer()
+monitoring_layer = MonitoringLayer(
+    aws_ec2_client=_aws_ec2_client,
+    aws_cost_client=_aws_cost_client,
+)
 
 # --- Instantiate cloud providers ---
 # We use a _DEFERRED sentinel to prevent providers from creating real SDK
