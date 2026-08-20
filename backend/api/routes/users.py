@@ -7,7 +7,7 @@ Both endpoints are protected by Admin role and require completed password change
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from backend.auth_models import CreateUserRequest, UserResponse
-from backend.database import get_db
+from backend.database import get_pool
 from backend.security import hash_password, validate_password_policy
 from backend.api.middleware.rbac import require_role, require_not_first_time
 from backend.api.main import success_response
@@ -48,36 +48,33 @@ async def create_user(body: CreateUserRequest):
     password_hash = hash_password(body.password)
 
     # Insert into users table
-    async with get_db() as db:
-        try:
-            await db.execute(
-                """
-                INSERT INTO users (username, password_hash, role, first_time_flag)
-                VALUES (?, ?, ?, 1)
-                """,
-                (body.username, password_hash, body.role),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        # Check if username already exists
+        existing = await conn.fetchrow(
+            "SELECT id FROM users WHERE username = $1", body.username
+        )
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Username already exists",
             )
-            await db.commit()
 
-            # Fetch the created user to get the created_at timestamp
-            cursor = await db.execute(
-                "SELECT username, role, created_at FROM users WHERE username = ?",
-                (body.username,),
-            )
-            row = await cursor.fetchone()
-        except Exception as e:
-            # Handle UNIQUE constraint violation
-            if "UNIQUE constraint failed" in str(e):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="Username already exists",
-                )
-            raise
+        await conn.execute(
+            "INSERT INTO users (username, password_hash, role, first_time_flag) VALUES ($1, $2, $3, TRUE)",
+            body.username, password_hash, body.role
+        )
+
+        # Fetch the created user to get the created_at timestamp
+        row = await conn.fetchrow(
+            "SELECT username, role, created_at FROM users WHERE username = $1",
+            body.username
+        )
 
     user = UserResponse(
         username=row["username"],
         role=row["role"],
-        created_at=row["created_at"],
+        created_at=str(row["created_at"]),
     )
     return success_response(user.model_dump())
 
@@ -92,17 +89,17 @@ async def list_users():
     Returns:
         List of UserResponse objects wrapped in success envelope.
     """
-    async with get_db() as db:
-        cursor = await db.execute(
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
             "SELECT username, role, created_at FROM users ORDER BY created_at DESC"
         )
-        rows = await cursor.fetchall()
 
     users = [
         UserResponse(
             username=row["username"],
             role=row["role"],
-            created_at=row["created_at"],
+            created_at=str(row["created_at"]),
         ).model_dump()
         for row in rows
     ]

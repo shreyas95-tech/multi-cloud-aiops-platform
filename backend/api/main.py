@@ -12,16 +12,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Any, Optional
 
-from backend.database import init_db, get_db
+from backend.database import init_db, get_pool
 
 
 async def cleanup_blacklist():
     """Background task that purges expired token_blacklist entries every 30 minutes."""
     while True:
         await asyncio.sleep(30 * 60)  # 30 minutes
-        async with get_db() as db:
-            await db.execute("DELETE FROM token_blacklist WHERE expires_at < datetime('now')")
-            await db.commit()
+        try:
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                await conn.execute("DELETE FROM token_blacklist WHERE expires_at < NOW()")
+        except Exception:
+            pass
 
 
 @asynccontextmanager

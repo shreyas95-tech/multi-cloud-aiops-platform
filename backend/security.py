@@ -3,12 +3,12 @@
 import os
 import re
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from jose import jwt, JWTError
 
-from backend.database import get_db
+from backend.database import get_pool
 
 # JWT configuration
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-secret-key-change-in-production")
@@ -41,7 +41,7 @@ def create_access_token(username: str, role: str, first_time: bool) -> str:
     Returns:
         Encoded JWT token string.
     """
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": username,
         "role": role,
@@ -123,20 +123,14 @@ class RateLimiter:
         Returns:
             True if the user has >= 5 failed attempts in the last 15 minutes.
         """
-        window_start = (
-            datetime.utcnow() - timedelta(minutes=RATE_LIMIT_WINDOW_MINUTES)
-        ).strftime("%Y-%m-%d %H:%M:%S")
+        window_start = datetime.now(timezone.utc) - timedelta(minutes=RATE_LIMIT_WINDOW_MINUTES)
 
-        async with get_db() as db:
-            cursor = await db.execute(
-                """
-                SELECT COUNT(*) as cnt FROM login_attempts
-                WHERE username = ? AND success = 0 AND attempted_at > ?
-                """,
-                (username, window_start),
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            count = await conn.fetchval(
+                "SELECT COUNT(*) FROM login_attempts WHERE username = $1 AND success = FALSE AND attempted_at > $2",
+                username, window_start
             )
-            row = await cursor.fetchone()
-            count = row[0] if row else 0
             return count >= RATE_LIMIT_MAX_ATTEMPTS
 
     async def record_attempt(self, username: str, success: bool) -> None:
@@ -146,15 +140,12 @@ class RateLimiter:
             username: The username that attempted login.
             success: Whether the attempt was successful.
         """
-        async with get_db() as db:
-            await db.execute(
-                """
-                INSERT INTO login_attempts (username, attempted_at, success)
-                VALUES (?, datetime('now'), ?)
-                """,
-                (username, 1 if success else 0),
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "INSERT INTO login_attempts (username, attempted_at, success) VALUES ($1, $2, $3)",
+                username, datetime.now(timezone.utc), success
             )
-            await db.commit()
 
     async def reset(self, username: str) -> None:
         """Clear failed login attempts for a username (called on successful login).
@@ -162,12 +153,9 @@ class RateLimiter:
         Args:
             username: The username to reset attempts for.
         """
-        async with get_db() as db:
-            await db.execute(
-                """
-                DELETE FROM login_attempts
-                WHERE username = ? AND success = 0
-                """,
-                (username,),
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "DELETE FROM login_attempts WHERE username = $1 AND success = FALSE",
+                username
             )
-            await db.commit()

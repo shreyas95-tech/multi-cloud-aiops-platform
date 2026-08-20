@@ -8,6 +8,7 @@ services:
     environment:
       - JWT_SECRET_KEY=change-this-in-production
       - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://aiopsadmin:AiOps2024Secure!@aiops-db.ctq62w4so4tn.ap-south-1.rds.amazonaws.com:5432/aiopsplatform
     volumes:
       - ./uploads/kb:/app/uploads/kb
     restart: unless-stopped

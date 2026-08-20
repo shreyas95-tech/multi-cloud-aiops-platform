@@ -1,6 +1,6 @@
 """Authentication routes: login, logout, password reset, and change-password endpoints."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -11,7 +11,7 @@ from backend.auth_models import (
     PasswordResetConfirm,
     ChangePasswordRequest,
 )
-from backend.database import get_db
+from backend.database import get_pool
 from backend.security import (
     RateLimiter,
     create_access_token,
@@ -47,12 +47,12 @@ async def login(request: LoginRequest):
         )
 
     # Query user from database
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT id, username, password_hash, role, first_time_flag FROM users WHERE username = ?",
-            (username,),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        user = await conn.fetchrow(
+            "SELECT id, username, password_hash, role, first_time_flag FROM users WHERE username = $1",
+            username
         )
-        user = await cursor.fetchone()
 
     # Validate credentials
     if not user or not verify_password(password, user["password_hash"]):
@@ -92,14 +92,14 @@ async def logout(current_user: dict = Depends(get_current_user)):
     blacklist with a 1-hour expiry.
     """
     jti = current_user["jti"]
-    expires_at = (datetime.utcnow() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
 
-    async with get_db() as db:
-        await db.execute(
-            "INSERT OR IGNORE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
-            (jti, expires_at),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO token_blacklist (jti, expires_at) VALUES ($1, $2) ON CONFLICT (jti) DO NOTHING",
+            jti, expires_at
         )
-        await db.commit()
 
     return success_response({"message": "Logged out successfully"})
 
@@ -115,12 +115,12 @@ async def reset_request(request: PasswordResetRequest):
     username = request.username
 
     # Check if user exists
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT id FROM users WHERE username = ?",
-            (username,),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        user = await conn.fetchrow(
+            "SELECT id FROM users WHERE username = $1",
+            username
         )
-        user = await cursor.fetchone()
 
     # If user doesn't exist, return generic success to prevent enumeration
     if not user:
@@ -128,14 +128,14 @@ async def reset_request(request: PasswordResetRequest):
 
     # Generate reset token with 30-minute expiry
     token = generate_reset_token()
-    expires_at = (datetime.utcnow() + timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
 
-    async with get_db() as db:
-        await db.execute(
-            "INSERT INTO reset_tokens (username, token, expires_at, used) VALUES (?, ?, ?, 0)",
-            (username, token, expires_at),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO reset_tokens (username, token, expires_at, used) VALUES ($1, $2, $3, $4)",
+            username, token, expires_at, False
         )
-        await db.commit()
 
     return success_response({
         "message": "If the account exists, a reset token has been generated.",
@@ -154,12 +154,12 @@ async def reset_password(request: PasswordResetConfirm):
     new_password = request.new_password
 
     # Look up the reset token
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT id, username, expires_at, used FROM reset_tokens WHERE token = ?",
-            (token,),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        token_row = await conn.fetchrow(
+            "SELECT id, username, expires_at, used FROM reset_tokens WHERE token = $1",
+            token
         )
-        token_row = await cursor.fetchone()
 
     # Validate token existence, usage, and expiry
     if not token_row:
@@ -174,9 +174,11 @@ async def reset_password(request: PasswordResetConfirm):
             detail="Reset token is invalid or expired",
         )
 
-    # Check expiry
-    expires_at = datetime.strptime(token_row["expires_at"], "%Y-%m-%d %H:%M:%S")
-    if datetime.utcnow() > expires_at:
+    # Check expiry - asyncpg returns datetime objects directly
+    expires_at = token_row["expires_at"]
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) > expires_at:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reset token is invalid or expired",
@@ -194,17 +196,17 @@ async def reset_password(request: PasswordResetConfirm):
     new_hash = hash_password(new_password)
     username = token_row["username"]
 
-    async with get_db() as db:
-        await db.execute(
-            "UPDATE users SET password_hash = ? WHERE username = ?",
-            (new_hash, username),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET password_hash = $1 WHERE username = $2",
+            new_hash, username
         )
         # Mark token as used
-        await db.execute(
-            "UPDATE reset_tokens SET used = 1 WHERE id = ?",
-            (token_row["id"],),
+        await conn.execute(
+            "UPDATE reset_tokens SET used = TRUE WHERE id = $1",
+            token_row["id"]
         )
-        await db.commit()
 
     return success_response({"message": "Password has been reset successfully."})
 
@@ -224,12 +226,12 @@ async def change_password(
     new_password = request.new_password
 
     # Get stored password hash
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT password_hash, role FROM users WHERE username = ?",
-            (username,),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        user = await conn.fetchrow(
+            "SELECT password_hash, role FROM users WHERE username = $1",
+            username
         )
-        user = await cursor.fetchone()
 
     if not user:
         raise HTTPException(
@@ -255,12 +257,12 @@ async def change_password(
     # Hash new password and update user record + clear first_time_flag
     new_hash = hash_password(new_password)
 
-    async with get_db() as db:
-        await db.execute(
-            "UPDATE users SET password_hash = ?, first_time_flag = 0 WHERE username = ?",
-            (new_hash, username),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET password_hash = $1, first_time_flag = FALSE WHERE username = $2",
+            new_hash, username
         )
-        await db.commit()
 
     # Issue new JWT with first_time=false
     role = user["role"]

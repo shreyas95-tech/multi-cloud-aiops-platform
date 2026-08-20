@@ -24,6 +24,7 @@ RUN mkdir -p /app/uploads/kb
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV JWT_SECRET_KEY=change-this-in-production
+ENV DATABASE_URL=postgresql://aiopsadmin:AiOps2024Secure!@aiops-db.ctq62w4so4tn.ap-south-1.rds.amazonaws.com:5432/aiopsplatform
 
 # Expose ports
 EXPOSE 8000

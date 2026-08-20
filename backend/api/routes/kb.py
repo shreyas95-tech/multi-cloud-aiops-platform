@@ -2,7 +2,7 @@
 
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from backend.api.main import success_response
 from backend.api.middleware.auth_middleware import get_current_user
 from backend.api.middleware.rbac import require_not_first_time, require_role
-from backend.database import get_db
+from backend.database import get_pool
 
 router = APIRouter(prefix="/api/kb", tags=["kb"])
 
@@ -74,25 +74,26 @@ async def upload_document(
     with open(file_path, "wb") as f:
         f.write(content)
 
-    # Insert metadata into database
-    async with get_db() as db:
-        cursor = await db.execute(
+    # Insert metadata into database using RETURNING to get the new ID
+    uploaded_at = datetime.now(timezone.utc)
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
             """
             INSERT INTO kb_documents (title, filename, file_path, content_type, file_size, uploaded_by, uploaded_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id
             """,
-            (
-                title,
-                original_filename,
-                file_path,
-                file.content_type,
-                file_size,
-                current_user["username"],
-                datetime.utcnow().isoformat(),
-            ),
+            title,
+            original_filename,
+            file_path,
+            file.content_type,
+            file_size,
+            current_user["username"],
+            uploaded_at,
         )
-        await db.commit()
-        document_id = cursor.lastrowid
+        document_id = row["id"]
 
     return {"document_id": document_id}
 
@@ -106,21 +107,21 @@ async def list_documents(current_user: dict = Depends(get_current_user)):
 
     Returns a list of documents with title, upload date, and uploader name.
     """
-    async with get_db() as db:
-        cursor = await db.execute(
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
             "SELECT id, title, filename, content_type, file_size, uploaded_by, uploaded_at FROM kb_documents ORDER BY uploaded_at DESC"
         )
-        rows = await cursor.fetchall()
 
     documents = [
         {
-            "id": row[0],
-            "title": row[1],
-            "filename": row[2],
-            "content_type": row[3],
-            "file_size": row[4],
-            "uploaded_by": row[5],
-            "uploaded_at": row[6],
+            "id": row["id"],
+            "title": row["title"],
+            "filename": row["filename"],
+            "content_type": row["content_type"],
+            "file_size": row["file_size"],
+            "uploaded_by": row["uploaded_by"],
+            "uploaded_at": str(row["uploaded_at"]),
         }
         for row in rows
     ]
@@ -137,12 +138,12 @@ async def get_document(document_id: int, current_user: dict = Depends(get_curren
 
     Returns the file as a download. Returns 404 if not found.
     """
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT file_path, filename, content_type FROM kb_documents WHERE id = ?",
-            (document_id,),
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT file_path, filename, content_type FROM kb_documents WHERE id = $1",
+            document_id
         )
-        row = await cursor.fetchone()
 
     if not row:
         raise HTTPException(
@@ -150,14 +151,14 @@ async def get_document(document_id: int, current_user: dict = Depends(get_curren
             detail=f"Document with ID {document_id} not found.",
         )
 
-    file_path = row[0]
-    filename = row[1]
-    content_type = row[2]
+    file_path = row["file_path"]
+    filename = row["filename"]
+    content_type = row["content_type"]
 
     if not os.path.exists(file_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Document file not found on disk.",
+            detail="Document file not found on disk.",
         )
 
     return FileResponse(

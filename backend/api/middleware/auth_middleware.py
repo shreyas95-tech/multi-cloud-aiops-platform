@@ -3,7 +3,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from backend.database import get_db
+from backend.database import get_pool
 from backend.security import decode_access_token
 
 security_scheme = HTTPBearer()
@@ -43,11 +43,12 @@ async def get_current_user(
         )
 
     # Check token blacklist
-    async with get_db() as db:
-        cursor = await db.execute(
-            "SELECT 1 FROM token_blacklist WHERE jti = ?", (jti,)
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        blacklisted = await conn.fetchrow(
+            "SELECT 1 FROM token_blacklist WHERE jti = $1", jti
         )
-        if await cursor.fetchone():
+        if blacklisted:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has been revoked",
