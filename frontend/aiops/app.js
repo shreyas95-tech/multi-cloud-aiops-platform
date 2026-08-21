@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const API_BASE = 'http://localhost:8000/api';
+  const API_BASE = '/api';
   const TIMEOUT_MS = 30000;
 
   const queryForm = document.getElementById('query-form');

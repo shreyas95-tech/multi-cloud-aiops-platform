@@ -5,7 +5,7 @@
   if (!Auth.requireAuth()) return;
 
   const role = Auth.getUserRole();
-  const API_BASE = 'http://localhost:8000/api';
+  const API_BASE = '/api';
 
   // ─── DOM References ───────────────────────────────────────────────────────
   const sidebar = document.getElementById('sidebar');
