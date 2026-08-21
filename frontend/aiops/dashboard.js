@@ -516,7 +516,7 @@
         var responseText = '✅ ' + (result.intent || 'Action processed') +
           '\n\nProvider: ' + (result.provider || result.cloud || 'N/A') +
           '\nAction: ' + (result.action || 'N/A') +
-          '\nState: ' + (result.state || result.success === false ? '❌ Failed' : '✓ Completed') +
+          '\nState: ' + (result.success === false ? '❌ Failed' : (result.state || '✓ Completed')) +
           (result.error_message ? '\n⚠️ ' + result.error_message : '');
         addMessage(responseText, 'response');
       })
