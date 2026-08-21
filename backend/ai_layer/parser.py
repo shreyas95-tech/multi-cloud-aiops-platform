@@ -64,11 +64,17 @@ If you cannot determine the action or provider, respond with:
     "conditions": ""
 }
 
+If the query is ambiguous but clearly about checking something (e.g., "is it running?", "what's the status?"), default to action="check_status" with cloud="AWS".
+
 Examples:
 - "Start my EC2 instance i-084cc52233ec63085" → {"intent": "start EC2 instance", "cloud": "AWS", "action": "start_instance", "conditions": "instance_id=i-084cc52233ec63085"}
 - "Stop Azure VM web-server in resource group prod-rg" → {"intent": "stop Azure VM", "cloud": "Azure", "action": "stop_instance", "conditions": "vm_name=web-server, resource_group=prod-rg"}
 - "What's the CPU usage?" → {"intent": "check CPU utilization", "cloud": "AWS", "action": "check_status", "conditions": ""}
 - "Show my costs" → {"intent": "get cost overview", "cloud": "AWS", "action": "get_costs", "conditions": ""}
+- "Is my server running?" → {"intent": "check instance status", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "Is it running?" → {"intent": "check instance status", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "How much am I spending?" → {"intent": "get cost overview", "cloud": "AWS", "action": "get_costs", "conditions": ""}
+- "Create a new instance" → {"intent": "create new EC2 instance", "cloud": "AWS", "action": "create_instance", "conditions": ""}
 """
 
 

@@ -513,11 +513,34 @@
       .then(function(data) {
         loadingEl.remove();
         var result = data.data || data;
-        var responseText = '✅ ' + (result.intent || 'Action processed') +
-          '\n\nProvider: ' + (result.provider || result.cloud || 'N/A') +
-          '\nAction: ' + (result.action || 'N/A') +
-          '\nState: ' + (result.success === false ? '❌ Failed' : (result.state || '✓ Completed')) +
-          (result.error_message ? '\n⚠️ ' + result.error_message : '');
+        var responseText = '';
+        
+        if (result.success === false) {
+          responseText = '❌ ' + (result.error_message || 'Action failed');
+        } else {
+          responseText = '✅ ' + (result.intent || 'Action processed');
+          
+          // Show instance details if available in metadata
+          if (result.metadata && result.metadata.instances && result.metadata.instances.length > 0) {
+            responseText += '\n\n📊 Instances:';
+            result.metadata.instances.forEach(function(inst) {
+              var stateEmoji = inst.state === 'running' ? '🟢' : (inst.state === 'stopped' ? '🟡' : '🔴');
+              var cpuStr = inst.cpu !== null && inst.cpu !== undefined ? inst.cpu + '%' : 'N/A';
+              responseText += '\n  ' + stateEmoji + ' ' + inst.resource_id + ' (' + inst.state + ') CPU: ' + cpuStr;
+            });
+          } else if (result.metadata && result.metadata.total_cost !== undefined) {
+            responseText += '\n\n💰 Total: $' + result.metadata.total_cost.toFixed(2);
+            responseText += '\n  Entries: ' + (result.metadata.entries || 0);
+          } else {
+            responseText += '\n\nProvider: ' + (result.provider || 'N/A');
+            responseText += '\nState: ' + (result.state || 'Completed');
+          }
+          
+          if (result.error_message) {
+            responseText += '\n⚠️ ' + result.error_message;
+          }
+        }
+        
         addMessage(responseText, 'response');
       })
       .catch(function(err) {
