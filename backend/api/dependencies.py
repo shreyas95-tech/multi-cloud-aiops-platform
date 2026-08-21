@@ -190,11 +190,138 @@ def _parse_gcp_conditions(conditions: str) -> dict:
     return params
 
 
+# --- Status and cost handlers ---
+
+async def _aws_check_status(params: dict) -> dict:
+    """Handler for AWS check_status — returns instance statuses."""
+    try:
+        statuses = await monitoring_layer.get_resource_status("AWS")
+        status_list = [{"resource_id": s.resource_id, "state": s.state, "cpu": s.cpu_utilization} for s in statuses]
+        return {
+            "success": True,
+            "provider": "AWS",
+            "resource_id": "all",
+            "action": "check_status",
+            "state": f"{len(status_list)} instances found",
+            "error_code": None,
+            "error_message": None,
+            "metadata": {"instances": status_list},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "AWS", "resource_id": "all",
+            "action": "check_status", "state": None,
+            "error_code": "StatusCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
+async def _azure_check_status(params: dict) -> dict:
+    """Handler for Azure check_status."""
+    try:
+        statuses = await monitoring_layer.get_resource_status("Azure")
+        status_list = [{"resource_id": s.resource_id, "state": s.state, "cpu": s.cpu_utilization} for s in statuses]
+        return {
+            "success": True, "provider": "Azure", "resource_id": "all",
+            "action": "check_status", "state": f"{len(status_list)} instances found",
+            "error_code": None, "error_message": None, "metadata": {"instances": status_list},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "Azure", "resource_id": "all",
+            "action": "check_status", "state": None,
+            "error_code": "StatusCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
+async def _gcp_check_status(params: dict) -> dict:
+    """Handler for GCP check_status."""
+    try:
+        statuses = await monitoring_layer.get_resource_status("GCP")
+        status_list = [{"resource_id": s.resource_id, "state": s.state, "cpu": s.cpu_utilization} for s in statuses]
+        return {
+            "success": True, "provider": "GCP", "resource_id": "all",
+            "action": "check_status", "state": f"{len(status_list)} instances found",
+            "error_code": None, "error_message": None, "metadata": {"instances": status_list},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "GCP", "resource_id": "all",
+            "action": "check_status", "state": None,
+            "error_code": "StatusCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
+async def _aws_get_costs(params: dict) -> dict:
+    """Handler for AWS get_costs — returns cost data."""
+    try:
+        costs = await monitoring_layer.get_costs()
+        aws_costs = [c for c in costs if c.provider == "AWS"]
+        total = sum(c.cost_amount for c in aws_costs)
+        return {
+            "success": True, "provider": "AWS", "resource_id": "all",
+            "action": "get_costs", "state": f"${total:.2f} total",
+            "error_code": None, "error_message": None,
+            "metadata": {"total_cost": total, "entries": len(aws_costs)},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "AWS", "resource_id": "all",
+            "action": "get_costs", "state": None,
+            "error_code": "CostCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
+async def _azure_get_costs(params: dict) -> dict:
+    """Handler for Azure get_costs."""
+    try:
+        costs = await monitoring_layer.get_costs()
+        azure_costs = [c for c in costs if c.provider == "Azure"]
+        total = sum(c.cost_amount for c in azure_costs)
+        return {
+            "success": True, "provider": "Azure", "resource_id": "all",
+            "action": "get_costs", "state": f"${total:.2f} total",
+            "error_code": None, "error_message": None,
+            "metadata": {"total_cost": total, "entries": len(azure_costs)},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "Azure", "resource_id": "all",
+            "action": "get_costs", "state": None,
+            "error_code": "CostCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
+async def _gcp_get_costs(params: dict) -> dict:
+    """Handler for GCP get_costs."""
+    try:
+        costs = await monitoring_layer.get_costs()
+        gcp_costs = [c for c in costs if c.provider == "GCP"]
+        total = sum(c.cost_amount for c in gcp_costs)
+        return {
+            "success": True, "provider": "GCP", "resource_id": "all",
+            "action": "get_costs", "state": f"${total:.2f} total",
+            "error_code": None, "error_message": None,
+            "metadata": {"total_cost": total, "entries": len(gcp_costs)},
+        }
+    except Exception as e:
+        return {
+            "success": False, "provider": "GCP", "resource_id": "all",
+            "action": "get_costs", "state": None,
+            "error_code": "CostCheckFailed", "error_message": str(e), "metadata": {},
+        }
+
+
 # --- Register all (provider, action) pairs in the Orchestrator ---
 
 orchestrator.register("AWS", "start_instance", _aws_start_instance)
 orchestrator.register("AWS", "stop_instance", _aws_stop_instance)
+orchestrator.register("AWS", "check_status", _aws_check_status)
+orchestrator.register("AWS", "get_costs", _aws_get_costs)
 orchestrator.register("Azure", "start_instance", _azure_start_instance)
 orchestrator.register("Azure", "stop_instance", _azure_stop_instance)
+orchestrator.register("Azure", "check_status", _azure_check_status)
+orchestrator.register("Azure", "get_costs", _azure_get_costs)
 orchestrator.register("GCP", "start_instance", _gcp_start_instance)
 orchestrator.register("GCP", "stop_instance", _gcp_stop_instance)
+orchestrator.register("GCP", "check_status", _gcp_check_status)
+orchestrator.register("GCP", "get_costs", _gcp_get_costs)
