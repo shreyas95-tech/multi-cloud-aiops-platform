@@ -65,6 +65,7 @@ If you cannot determine the action or provider, respond with:
 }
 
 If the query is ambiguous but clearly about checking something (e.g., "is it running?", "what's the status?"), default to action="check_status" with cloud="AWS".
+If the query asks about instance type, instance details, or free tier status, map it to action="check_status" since the status response includes instance type information.
 
 Examples:
 - "Start my EC2 instance i-084cc52233ec63085" → {"intent": "start EC2 instance", "cloud": "AWS", "action": "start_instance", "conditions": "instance_id=i-084cc52233ec63085"}
@@ -75,6 +76,11 @@ Examples:
 - "Is it running?" → {"intent": "check instance status", "cloud": "AWS", "action": "check_status", "conditions": ""}
 - "How much am I spending?" → {"intent": "get cost overview", "cloud": "AWS", "action": "get_costs", "conditions": ""}
 - "Create a new instance" → {"intent": "create new EC2 instance", "cloud": "AWS", "action": "create_instance", "conditions": ""}
+- "Which instance type is being used?" → {"intent": "check instance status and type", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "What type of EC2 instance is running?" → {"intent": "check instance type", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "Is it a free tier instance?" → {"intent": "check instance status and type", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "Show me my instances" → {"intent": "list all instances", "cloud": "AWS", "action": "check_status", "conditions": ""}
+- "What resources do I have?" → {"intent": "check instance status", "cloud": "AWS", "action": "check_status", "conditions": ""}
 """
 
 
