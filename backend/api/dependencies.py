@@ -193,10 +193,30 @@ def _parse_gcp_conditions(conditions: str) -> dict:
 # --- Status and cost handlers ---
 
 async def _aws_check_status(params: dict) -> dict:
-    """Handler for AWS check_status — returns instance statuses."""
+    """Handler for AWS check_status — returns instance statuses with instance type."""
     try:
         statuses = await monitoring_layer.get_resource_status("AWS")
-        status_list = [{"resource_id": s.resource_id, "state": s.state, "cpu": s.cpu_utilization} for s in statuses]
+
+        # Also get instance types from the EC2 client
+        instance_types = {}
+        if monitoring_layer._aws_ec2_client:
+            raw_response = await monitoring_layer._aws_ec2_client.describe_instances()
+            for reservation in raw_response.get("Reservations", []):
+                for inst in reservation.get("Instances", []):
+                    instance_types[inst.get("InstanceId", "")] = inst.get("InstanceType", "unknown")
+
+        status_list = []
+        for s in statuses:
+            inst_type = instance_types.get(s.resource_id, "unknown")
+            free_tier = inst_type in ("t2.micro", "t3.micro")
+            status_list.append({
+                "resource_id": s.resource_id,
+                "state": s.state,
+                "cpu": s.cpu_utilization,
+                "instance_type": inst_type,
+                "free_tier": free_tier,
+            })
+
         return {
             "success": True,
             "provider": "AWS",

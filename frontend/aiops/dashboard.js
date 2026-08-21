@@ -526,7 +526,8 @@
             result.metadata.instances.forEach(function(inst) {
               var stateEmoji = inst.state === 'running' ? '🟢' : (inst.state === 'stopped' ? '🟡' : '🔴');
               var cpuStr = inst.cpu !== null && inst.cpu !== undefined ? inst.cpu + '%' : 'N/A';
-              responseText += '\n  ' + stateEmoji + ' ' + inst.resource_id + ' (' + inst.state + ') CPU: ' + cpuStr;
+              var typeStr = inst.instance_type ? ' [' + inst.instance_type + (inst.free_tier ? ' ✓ Free Tier' : '') + ']' : '';
+              responseText += '\n  ' + stateEmoji + ' ' + inst.resource_id + typeStr + ' (' + inst.state + ') CPU: ' + cpuStr;
             });
           } else if (result.metadata && result.metadata.total_cost !== undefined) {
             responseText += '\n\n💰 Total: $' + result.metadata.total_cost.toFixed(2);
