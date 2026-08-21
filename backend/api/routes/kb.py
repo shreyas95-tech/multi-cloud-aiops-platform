@@ -2,7 +2,7 @@
 
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
@@ -75,7 +75,7 @@ async def upload_document(
         f.write(content)
 
     # Insert metadata into database using RETURNING to get the new ID
-    uploaded_at = datetime.now(timezone.utc)
+    uploaded_at = datetime.utcnow()
 
     pool = await get_pool()
     async with pool.acquire() as conn:

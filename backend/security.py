@@ -3,7 +3,7 @@
 import os
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import bcrypt
 from jose import jwt, JWTError
@@ -41,7 +41,7 @@ def create_access_token(username: str, role: str, first_time: bool) -> str:
     Returns:
         Encoded JWT token string.
     """
-    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": username,
         "role": role,
@@ -123,7 +123,7 @@ class RateLimiter:
         Returns:
             True if the user has >= 5 failed attempts in the last 15 minutes.
         """
-        window_start = datetime.now(timezone.utc) - timedelta(minutes=RATE_LIMIT_WINDOW_MINUTES)
+        window_start = datetime.utcnow() - timedelta(minutes=RATE_LIMIT_WINDOW_MINUTES)
 
         pool = await get_pool()
         async with pool.acquire() as conn:
@@ -144,7 +144,7 @@ class RateLimiter:
         async with pool.acquire() as conn:
             await conn.execute(
                 "INSERT INTO login_attempts (username, attempted_at, success) VALUES ($1, $2, $3)",
-                username, datetime.now(timezone.utc), success
+                username, datetime.utcnow(), success
             )
 
     async def reset(self, username: str) -> None:

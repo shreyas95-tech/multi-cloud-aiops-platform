@@ -92,7 +92,7 @@ async def logout(current_user: dict = Depends(get_current_user)):
     blacklist with a 1-hour expiry.
     """
     jti = current_user["jti"]
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -128,7 +128,7 @@ async def reset_request(request: PasswordResetRequest):
 
     # Generate reset token with 30-minute expiry
     token = generate_reset_token()
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
+    expires_at = datetime.utcnow() + timedelta(minutes=30)
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -178,7 +178,7 @@ async def reset_password(request: PasswordResetConfirm):
     expires_at = token_row["expires_at"]
     if expires_at.tzinfo is None:
         expires_at = expires_at.replace(tzinfo=timezone.utc)
-    if datetime.now(timezone.utc) > expires_at:
+    if datetime.utcnow() > expires_at:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reset token is invalid or expired",
