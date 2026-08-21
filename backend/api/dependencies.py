@@ -33,6 +33,15 @@ except Exception:
     _aws_ec2_client = None
     _aws_cost_client = None
 
+# --- Azure live client configuration ---
+# Uses env vars (AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_SUBSCRIPTION_ID).
+try:
+    from backend.monitoring.azure_live_client import AzureLiveMonitoringClient
+
+    _azure_monitor_client = AzureLiveMonitoringClient()
+except Exception:
+    _azure_monitor_client = None
+
 # --- Instantiate services ---
 
 ai_layer = AILayer()
@@ -40,6 +49,7 @@ orchestrator = Orchestrator()
 monitoring_layer = MonitoringLayer(
     aws_ec2_client=_aws_ec2_client,
     aws_cost_client=_aws_cost_client,
+    azure_monitor_client=_azure_monitor_client,
 )
 
 # --- Instantiate cloud providers ---
