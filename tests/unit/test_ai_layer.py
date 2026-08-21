@@ -184,11 +184,11 @@ async def test_query_501_chars_raises_error(ai_layer):
 
 @pytest.mark.asyncio
 async def test_timeout_raises_parse_error(ai_layer):
-    """Parsing that exceeds 10-second timeout raises ParseError with timeout message."""
-    # Mock _parse_query to simulate a timeout by making asyncio.wait_for raise TimeoutError
+    """Parsing that exceeds timeout raises ParseError with timeout message."""
+    # Mock _parse_with_patterns to simulate a timeout by making asyncio.wait_for raise TimeoutError
     with patch.object(
         ai_layer,
-        "_parse_query",
+        "_parse_with_patterns",
         new_callable=AsyncMock,
         side_effect=asyncio.TimeoutError(),
     ):
@@ -199,8 +199,8 @@ async def test_timeout_raises_parse_error(ai_layer):
 
 
 @pytest.mark.asyncio
-async def test_timeout_uses_10_second_limit():
-    """Verify the PARSE_TIMEOUT_SECONDS constant is 10."""
+async def test_timeout_uses_30_second_limit():
+    """Verify the PARSE_TIMEOUT_SECONDS constant is 30."""
     from backend.ai_layer.parser import PARSE_TIMEOUT_SECONDS
 
-    assert PARSE_TIMEOUT_SECONDS == 10
+    assert PARSE_TIMEOUT_SECONDS == 30

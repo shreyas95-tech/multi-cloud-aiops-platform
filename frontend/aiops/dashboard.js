@@ -513,10 +513,11 @@
       .then(function(data) {
         loadingEl.remove();
         var result = data.data || data;
-        var responseText = 'Provider: ' + (result.provider || result.cloud || 'N/A') +
+        var responseText = '✅ ' + (result.intent || 'Action processed') +
+          '\n\nProvider: ' + (result.provider || result.cloud || 'N/A') +
           '\nAction: ' + (result.action || 'N/A') +
-          '\nState: ' + (result.state || 'Completed') +
-          (result.error_message ? '\nError: ' + result.error_message : '');
+          '\nState: ' + (result.state || result.success === false ? '❌ Failed' : '✓ Completed') +
+          (result.error_message ? '\n⚠️ ' + result.error_message : '');
         addMessage(responseText, 'response');
       })
       .catch(function(err) {
