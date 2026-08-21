@@ -12,6 +12,8 @@ Exports configured instances for use by route handlers.
 
 import os
 
+import boto3
+
 from backend.ai_layer.parser import AILayer
 from backend.execution.aws_provider import AWSProvider
 from backend.execution.azure_provider import AzureProvider
@@ -351,12 +353,89 @@ async def _gcp_get_costs(params: dict) -> dict:
         }
 
 
+# --- Free tier instance creation ---
+
+# Free tier instance types allowed
+FREE_TIER_TYPES = ("t2.micro", "t3.micro")
+MAX_INSTANCES_ALLOWED = 3  # Safety limit
+
+
+async def _aws_create_instance(params: dict) -> dict:
+    """Handler for AWS create_instance — creates a free-tier EC2 instance.
+
+    Safety guardrails:
+    - Only t3.micro allowed (free tier)
+    - Maximum 3 instances total
+    - Only ap-south-1 region
+    """
+    import asyncio
+
+    def _call():
+        try:
+            ec2 = boto3.client("ec2", region_name=_aws_region)
+
+            # Safety check: count existing instances
+            existing = ec2.describe_instances(
+                Filters=[{"Name": "instance-state-name", "Values": ["running", "stopped", "pending"]}]
+            )
+            count = sum(len(r["Instances"]) for r in existing["Reservations"])
+
+            if count >= MAX_INSTANCES_ALLOWED:
+                return {
+                    "success": False, "provider": "AWS", "resource_id": "none",
+                    "action": "create_instance", "state": None,
+                    "error_code": "LimitExceeded",
+                    "error_message": f"Cannot create more instances. You already have {count} (max {MAX_INSTANCES_ALLOWED}). Stop or terminate some first.",
+                    "metadata": {"existing_count": count},
+                }
+
+            # Get the latest Ubuntu 22.04 AMI
+            images = ec2.describe_images(
+                Owners=["099720109477"],
+                Filters=[
+                    {"Name": "name", "Values": ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]},
+                    {"Name": "state", "Values": ["available"]},
+                ],
+            )
+            ami_id = sorted(images["Images"], key=lambda x: x["CreationDate"], reverse=True)[0]["ImageId"]
+
+            # Create the instance (t3.micro only)
+            response = ec2.run_instances(
+                ImageId=ami_id,
+                InstanceType="t3.micro",
+                MinCount=1,
+                MaxCount=1,
+                TagSpecifications=[{
+                    "ResourceType": "instance",
+                    "Tags": [{"Key": "Name", "Value": "AIOps-Created"}, {"Key": "CreatedBy", "Value": "AIOps-Bot"}]
+                }],
+            )
+
+            instance_id = response["Instances"][0]["InstanceId"]
+
+            return {
+                "success": True, "provider": "AWS", "resource_id": instance_id,
+                "action": "create_instance", "state": "launching",
+                "error_code": None, "error_message": None,
+                "metadata": {"instance_type": "t3.micro", "ami": ami_id, "region": _aws_region, "free_tier": True},
+            }
+        except Exception as e:
+            return {
+                "success": False, "provider": "AWS", "resource_id": "none",
+                "action": "create_instance", "state": None,
+                "error_code": "CreateFailed", "error_message": str(e), "metadata": {},
+            }
+
+    return await asyncio.to_thread(_call)
+
+
 # --- Register all (provider, action) pairs in the Orchestrator ---
 
 orchestrator.register("AWS", "start_instance", _aws_start_instance)
 orchestrator.register("AWS", "stop_instance", _aws_stop_instance)
 orchestrator.register("AWS", "check_status", _aws_check_status)
 orchestrator.register("AWS", "get_costs", _aws_get_costs)
+orchestrator.register("AWS", "create_instance", _aws_create_instance)
 orchestrator.register("Azure", "start_instance", _azure_start_instance)
 orchestrator.register("Azure", "stop_instance", _azure_stop_instance)
 orchestrator.register("Azure", "check_status", _azure_check_status)

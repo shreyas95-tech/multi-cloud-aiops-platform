@@ -517,6 +517,8 @@
         
         if (result.success === false) {
           responseText = '❌ ' + (result.error_message || 'Action failed');
+        } else if (result.metadata && result.metadata.type === 'conversational') {
+          responseText = '💬 ' + (result.state || 'No response');
         } else {
           responseText = '✅ ' + (result.intent || 'Action processed');
           

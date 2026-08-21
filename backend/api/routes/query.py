@@ -67,7 +67,29 @@ async def post_query(body: QueryRequest):
     # Step 1: Forward to AI Layer for intent parsing
     try:
         intent = await _ai_layer.parse_intent(body.query)
-    except (ParseError, AIUnsupportedProviderError, QueryTooLongError) as exc:
+    except ParseError:
+        # Not an actionable command — try conversational response
+        try:
+            response = await _ai_layer.get_conversational_response(body.query)
+            return JSONResponse(
+                status_code=200,
+                content=success_response({
+                    "success": True,
+                    "provider": "AI",
+                    "resource_id": "chat",
+                    "action": "conversation",
+                    "state": response,
+                    "error_code": None,
+                    "error_message": None,
+                    "metadata": {"type": "conversational"},
+                }),
+            )
+        except Exception:
+            return JSONResponse(
+                status_code=502,
+                content=error_response({"service": "ai_layer", "message": "Could not process query"}),
+            )
+    except (AIUnsupportedProviderError, QueryTooLongError) as exc:
         return JSONResponse(
             status_code=502,
             content=error_response({

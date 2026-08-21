@@ -40,6 +40,7 @@ Available actions:
 - stop_instance: Stop a cloud instance/VM
 - check_status: Check the status/CPU of instances
 - get_costs: Get cost information
+- create_instance: Create a new cloud instance (only free-tier t3.micro allowed)
 
 Available providers: AWS, Azure, GCP
 
@@ -124,6 +125,26 @@ class AILayer:
                 raise ParseError(f"Failed to parse intent: {str(e)}")
 
         return intent
+
+    async def get_conversational_response(self, query: str) -> str:
+        """Get a direct conversational response from OpenAI for non-action queries."""
+        if not self._openai_client:
+            raise ParseError("OpenAI not configured")
+
+        response = await self._openai_client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": """You are a helpful AI assistant for a Multi-Cloud AIOps Platform. 
+Answer questions about cloud computing, AWS, Azure, GCP, instance types, pricing, best practices, etc.
+Keep responses concise (2-3 sentences max). Be helpful and informative.
+If asked about the platform's capabilities, mention: start/stop instances, check status/CPU, view costs, create free-tier instances.
+Current infrastructure: AWS EC2 (t3.small, ap-south-1), Azure VM (Standard_B2ats_v2, southindia), GCP Compute Engine."""},
+                {"role": "user", "content": query},
+            ],
+            temperature=0.7,
+            max_tokens=200,
+        )
+        return response.choices[0].message.content.strip()
 
     async def _parse_with_openai(self, query: str) -> IntentJSON:
         """Parse query using OpenAI chat completion."""
