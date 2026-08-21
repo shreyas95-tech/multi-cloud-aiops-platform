@@ -42,6 +42,15 @@ try:
 except Exception:
     _azure_monitor_client = None
 
+# --- GCP live client configuration ---
+# Uses env vars (GCP_CREDENTIALS_JSON, GCP_PROJECT_ID).
+try:
+    from backend.monitoring.gcp_live_client import GCPLiveMonitoringClient
+
+    _gcp_monitoring_client = GCPLiveMonitoringClient()
+except Exception:
+    _gcp_monitoring_client = None
+
 # --- Instantiate services ---
 
 ai_layer = AILayer()
@@ -50,6 +59,7 @@ monitoring_layer = MonitoringLayer(
     aws_ec2_client=_aws_ec2_client,
     aws_cost_client=_aws_cost_client,
     azure_monitor_client=_azure_monitor_client,
+    gcp_monitoring_client=_gcp_monitoring_client,
 )
 
 # --- Instantiate cloud providers ---
