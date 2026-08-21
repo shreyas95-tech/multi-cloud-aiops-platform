@@ -55,7 +55,7 @@ You MUST respond with ONLY a JSON object in this exact format:
     "conditions": "key=value parameters, e.g. instance_id=i-abc123"
 }
 
-If the query is about checking status or costs across all providers, use cloud="AWS" as default.
+If the query explicitly mentions a provider (Azure, GCP, AWS), use that provider. Only default to cloud="AWS" if no provider is mentioned at all.
 If you cannot determine the action or provider, respond with:
 {
     "intent": "unclear",
